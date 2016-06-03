@@ -25,9 +25,18 @@ REPOPATH ?= k8s.io/minikube
 BUILD_IMAGE ?= gcr.io/google_containers/kube-cross:v1.6.2-1
 
 ifeq ($(IN_DOCKER),1)
-	GOPATH := /go
+    GOPATH := /go
 else
-	GOPATH := $(shell pwd)/_gopath
+    # Not defined locally GOPATH since shell will not have the value set
+    # see http://savannah.gnu.org/bugs/?10593
+    # If defined locally, we then need to set the env var for each call to go
+    EXPECTED_GOPATH := $(shell pwd)/_gopath
+    ifndef GOPATH
+        $(error GOPATH is not set. Must be set to $(EXPECTED_GOPATH))
+    endif
+    ifneq ($(GOPATH), $(EXPECTED_GOPATH))
+        $(error GOPATH is expexted to be $(EXPECTED_GOPATH))
+    endif
 endif
 
 
@@ -43,22 +52,38 @@ LOCALKUBE_LDFLAGS := "$(K8S_VERSION_LDFLAGS) $(MINIKUBE_LDFLAGS) -s -w -extldfla
 clean:
 	rm -rf $(GOPATH)
 	rm -rf $(BUILD_DIR)
-	rm pkg/minikube/cluster/assets.go
+	rm -f pkg/minikube/cluster/localkubecontents.go
 
-MKGOPATH := mkdir -p $(shell dirname $(GOPATH)/src/$(REPOPATH)) && ln -s -f $(shell pwd) $(GOPATH)/src/$(REPOPATH)
+ifeq ($(IN_DOCKER),1)
+	# Windows Virtual box does not support symlinks
+    MKGOPATH := if [ ! -d $(GOPATH)/src/$(REPOPATH) ];  then exit 1 ; fi
+else
+    MKGOPATH := mkdir -p $(shell dirname $(GOPATH)/src/$(REPOPATH)) && ln -s -f $(shell pwd) $(GOPATH)/src/$(REPOPATH)
+endif
+
 
 LOCALKUBEFILES := $(shell go list  -f '{{join .Deps "\n"}}' ./cmd/localkube/ | grep k8s.io | xargs go list -f '{{ range $$file := .GoFiles }} {{$$.Dir}}/{{$$file}}{{"\n"}}{{end}}')
 MINIKUBEFILES := $(shell go list  -f '{{join .Deps "\n"}}' ./cmd/minikube/ | grep k8s.io | xargs go list -f '{{ range $$file := .GoFiles }} {{$$.Dir}}/{{$$file}}{{"\n"}}{{end}}')
 
+OUTPUT := $(BUILD_DIR)/minikube
+ifeq ($(GOOS),windows)
+	OUTPUT := $(OUTPUT).exe
+endif
 out/minikube: out/minikube-$(GOOS)-$(GOARCH)
-	cp $(BUILD_DIR)/minikube-$(GOOS)-$(GOARCH) $(BUILD_DIR)/minikube
+	cp $(BUILD_DIR)/minikube-$(GOOS)-$(GOARCH) $(OUTPUT)
 
 out/localkube: $(LOCALKUBEFILES)
 	$(MKGOPATH)
 ifeq ($(BUILD_OS),Linux)
 	CGO_ENABLED=1 go build -ldflags=$(LOCALKUBE_LDFLAGS) -o $(BUILD_DIR)/localkube ./cmd/localkube
 else
-	docker run -w /go/src/$(REPOPATH) -e IN_DOCKER=1 -v $(shell pwd):/go/src/$(REPOPATH) $(BUILD_IMAGE) make out/localkube
+    # double the first slash to avoid POSIX-to-Windows path conversion in msys
+	docker run -w //go/src/$(REPOPATH) -e IN_DOCKER=1 -v /$(shell pwd)://go/src/$(REPOPATH) $(BUILD_IMAGE) make out/localkube
+endif
+
+OUTPUT_OS_ARCH := $(BUILD_DIR)/minikube-$(GOOS)-$(GOARCH)
+ifeq ($(GOOS),windows)
+	OUTPUT_OS_ARCH := $(OUTPUT_OS_ARCH).exe
 endif
 
 out/minikube-$(GOOS)-$(GOARCH): $(MINIKUBEFILES) pkg/minikube/cluster/assets.go

@@ -189,6 +189,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for an overview of how to send pull reque
 ### Build Instructions
 
 ```shell
+export GOPATH=$(pwd)/_gopath
 make out/minikube
 ```
 
@@ -212,7 +213,7 @@ make test
 
 #### Integration Tests
 
-Integration tests are currently run manually. 
+Integration tests are currently run manually.
 To run them, build the binary and run the tests:
 
 ```shell
