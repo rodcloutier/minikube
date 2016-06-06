@@ -17,19 +17,19 @@ limitations under the License.
 package constants
 
 import (
-	"os"
 	"path/filepath"
+    "github.com/mitchellh/go-homedir"
 )
 
 // MachineName is the name to use for the VM.
 const MachineName = "minikubeVM"
 
-// Fix for windows
-var Minipath = filepath.Join(os.Getenv("HOME"), ".minikube")
+var HomeDir, _ = homedir.Dir()
 
-// TODO: Fix for windows
+var Minipath = filepath.Join(HomeDir, ".minikube")
+
 // KubeconfigPath is the path to the Kubernetes client config
-var KubeconfigPath = filepath.Join(os.Getenv("HOME"), ".kube", "config")
+var KubeconfigPath = filepath.Join(HomeDir, ".kube", "config")
 
 // MinikubeContext is the kubeconfig context name used for minikube
 const MinikubeContext = "minikube"

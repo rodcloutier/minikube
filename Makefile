@@ -25,18 +25,9 @@ REPOPATH ?= k8s.io/minikube
 BUILD_IMAGE ?= gcr.io/google_containers/kube-cross:v1.6.2-1
 
 ifeq ($(IN_DOCKER),1)
-    GOPATH := /go
+	GOPATH := /go
 else
-    # Not defined locally GOPATH since shell will not have the value set
-    # see http://savannah.gnu.org/bugs/?10593
-    # If defined locally, we then need to set the env var for each call to go
-    EXPECTED_GOPATH := $(shell pwd)/_gopath
-    ifndef GOPATH
-        $(error GOPATH is not set. Must be set to $(EXPECTED_GOPATH))
-    endif
-    ifneq ($(GOPATH), $(EXPECTED_GOPATH))
-        $(error GOPATH is expexted to be $(EXPECTED_GOPATH))
-    endif
+	GOPATH := $(shell pwd)/_gopath
 endif
 
 

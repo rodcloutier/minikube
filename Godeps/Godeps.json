@@ -1282,6 +1282,10 @@
 			"Rev": "1b4ae6fb4e77b095934d4430860ff202060169f8"
 		},
 		{
+			"ImportPath": "github.com/mitchellh/go-homedir",
+			"Rev": "756f7b183b7ab78acdbbee5c7f392838ed459dda"
+		},
+		{
 			"ImportPath": "github.com/mitchellh/mapstructure",
 			"Rev": "740c764bc6149d3f1806231418adb9f52c11bcbf"
 		},
