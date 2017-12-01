@@ -425,7 +425,7 @@ func generateConfig(k8s config.KubernetesConfig, r cruntime.Manager) (string, er
 		NoTaintMaster     bool
 	}{
 		CertDir:           util.DefaultCertPath,
-		ServiceCIDR:       util.DefaultServiceCIDR,
+		ServiceCIDR:       k8s.ServiceCIDR,
 		AdvertiseAddress:  k8s.NodeIP,
 		APIServerPort:     nodePort,
 		KubernetesVersion: k8s.KubernetesVersion,

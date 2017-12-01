@@ -44,6 +44,10 @@ func NewAddon(assets []*BinDataAsset, enabled bool, addonName string) *Addon {
 	return a
 }
 
+func (a *Addon) Name() string {
+	return a.addonName
+}
+
 func (a *Addon) IsEnabled() (bool, error) {
 	addonStatusText, err := config.Get(a.addonName)
 	if err == nil {

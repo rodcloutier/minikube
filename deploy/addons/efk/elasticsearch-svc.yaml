@@ -22,6 +22,9 @@ metadata:
     kubernetes.io/minikube-addons: efk
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
+  selector:
+    k8s-app: kube-dns
+  clusterIP: {{.clusterIP}}
   ports:
   - port: 9200
     protocol: TCP

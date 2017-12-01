@@ -30,6 +30,7 @@ const (
 	DefaultKubeConfigPath    = DefaultMinikubeDirectory + "/kubeconfig"
 	DefaultDNSDomain         = "cluster.local"
 	DefaultServiceCIDR       = "10.96.0.0/12"
+	DefaultDNSClusterIP      = "10.96.0.10"
 )
 
 var DefaultAdmissionControllers = []string{

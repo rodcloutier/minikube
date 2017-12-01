@@ -149,6 +149,20 @@ func NewBinDataAsset(assetName, targetDir, targetName, permissions string) *BinD
 	return m
 }
 
+func CloneBinDataAsset(m *BinDataAsset, data []byte) *BinDataAsset {
+	return &BinDataAsset{
+		BaseAsset{
+			data:        data,
+			reader:      bytes.NewReader(data),
+			Length:      len(data),
+			AssetName:   m.AssetName,
+			TargetDir:   m.TargetDir,
+			TargetName:  m.TargetName,
+			Permissions: m.Permissions,
+		},
+	}
+}
+
 func (m *BinDataAsset) loadData() error {
 	contents, err := Asset(m.AssetName)
 	if err != nil {
@@ -166,4 +180,8 @@ func (m *BinDataAsset) GetLength() int {
 
 func (m *BinDataAsset) Read(p []byte) (int, error) {
 	return m.reader.Read(p)
+}
+
+func (m *BinDataAsset) GetData() []byte {
+	return m.data
 }
