@@ -149,7 +149,7 @@ func NewBinDataAsset(assetName, targetDir, targetName, permissions string) *BinD
 	return m
 }
 
-func CloneBinDataAsset(m *BinDataAsset, data []byte) *BinDataAsset {
+func cloneBinDataAsset(m *BinDataAsset, data []byte) *BinDataAsset {
 	return &BinDataAsset{
 		BaseAsset{
 			data:        data,

@@ -24,7 +24,7 @@ metadata:
 spec:
   selector:
     k8s-app: kube-dns
-  clusterIP: {{.clusterIP}}
+  clusterIP: {{.DNSIP}}
   ports:
   - port: 9200
     protocol: TCP
