@@ -158,6 +158,7 @@ func runStart(cmd *cobra.Command, args []string) {
 		InsecureRegistry:    insecureRegistry,
 		RegistryMirror:      registryMirror,
 		HostOnlyCIDR:        viper.GetString(hostOnlyCIDR),
+		ServiceCIDR:         viper.GetString(serviceCIDR),
 		HypervVirtualSwitch: viper.GetString(hypervVirtualSwitch),
 		KvmNetwork:          viper.GetString(kvmNetwork),
 		Downloader:          pkgutil.DefaultDownloader{},

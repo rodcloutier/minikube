@@ -17,9 +17,7 @@ limitations under the License.
 package assets
 
 import (
-	"bytes"
 	"fmt"
-	"html/template"
 	"os"
 	"path"
 	"path/filepath"
@@ -44,10 +42,6 @@ func NewAddon(assets []*BinDataAsset, enabled bool, addonName string) *Addon {
 		addonName: addonName,
 	}
 	return a
-}
-
-func (a *Addon) Name() string {
-	return a.addonName
 }
 
 func (a *Addon) IsEnabled() (bool, error) {
@@ -337,27 +331,4 @@ func addMinikubeDirToAssets(basedir, vmpath string, assets *[]CopyableFile) erro
 		return errors.Wrap(err, "walking filepath")
 	}
 	return nil
-}
-
-// AddonsConfig contains the values that can be used within
-// the addons for dynamic templating
-type AddonsConfig struct {
-	clusterIP string
-	DNSIP     string
-}
-
-// ResolveAddonTemplating resolves the templates present in the addon file
-// with the value in the AddonsConfig struct
-func ResolveAddonTemplating(addon *BinDataAsset, cfg AddonsConfig) (*BinDataAsset, error) {
-	tmpl, err := template.New("config").Parse(string(addon.GetData()))
-	if err != nil {
-		return nil, err
-	}
-
-	buf := new(bytes.Buffer)
-	err = tmpl.Execute(buf, cfg)
-	if err != nil {
-		return nil, err
-	}
-	return cloneBinDataAsset(addon, buf.Bytes()), nil
 }

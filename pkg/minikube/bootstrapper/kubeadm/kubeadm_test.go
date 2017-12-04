@@ -242,6 +242,7 @@ schedulerExtraArgs:
 				NodePort:          18443,
 				KubernetesVersion: "v1.10.0",
 				NodeName:          "minikube",
+				ServiceCIDR:       "172.16.0.0/12",
 			},
 			expectedCfg: `apiVersion: kubeadm.k8s.io/v1alpha1
 kind: MasterConfiguration
@@ -253,7 +254,7 @@ api:
 kubernetesVersion: v1.10.0
 certificatesDir: /var/lib/minikube/certs/
 networking:
-  serviceSubnet: 10.96.0.0/12
+  serviceSubnet: 172.16.0.0/12
 etcd:
   dataDir: /data/minikube
 nodeName: minikube

@@ -233,8 +233,6 @@ var versionSpecificOpts = []VersionedExtraOption{
 	NewUnversionedOption(Kubelet, "allow-privileged", "true"),
 
 	// Network args
-	// TODO [rod] change this
-	NewUnversionedOption(Kubelet, "cluster-dns", "10.96.0.10"),
 	NewUnversionedOption(Kubelet, "cluster-domain", "cluster.local"),
 
 	// Auth args

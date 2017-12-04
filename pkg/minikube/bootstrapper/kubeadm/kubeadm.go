@@ -289,15 +289,22 @@ func NewKubeletConfig(k8s config.KubernetesConfig, r cruntime.Manager) (string, 
 		return "", errors.Wrap(err, "parses feature gate config for kubelet")
 	}
 
+	clusterDNS, err := util.GetDNSIP(k8s.ServiceCIDR)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to fetch cluster DNS IP")
+	}
+
 	b := bytes.Buffer{}
 	opts := struct {
 		ExtraOptions     string
 		FeatureGates     string
 		ContainerRuntime string
+		ClusterDNS       string
 	}{
 		ExtraOptions:     extraFlags,
 		FeatureGates:     kubeletFeatureArgs,
 		ContainerRuntime: k8s.ContainerRuntime,
+		ClusterDNS:       clusterDNS.String(),
 	}
 	if err := kubeletSystemdTemplate.Execute(&b, opts); err != nil {
 		return "", err
@@ -405,15 +412,25 @@ func generateConfig(k8s config.KubernetesConfig, r cruntime.Manager) (string, er
 		return "", errors.Wrap(err, "generating extra component config for kubeadm")
 	}
 
+	// TODO change the (Kubelet, "cluster-dns", "10.96.0.10") here to reflect ServiceCIDR ?
+	// Do we actually need to do anything but changing the docker machine config?
+	// it seems to already work
+
 	// In case of no port assigned, use util.APIServerPort
 	nodePort := k8s.NodePort
 	if nodePort <= 0 {
 		nodePort = util.APIServerPort
 	}
 
+	clusterDNS, err := util.GetDNSIP(k8s.ServiceCIDR)
+	if err != nil {
+		return "", errors.Wrap(err, "getting DNS ip")
+	}
+
 	opts := struct {
 		CertDir           string
 		ServiceCIDR       string
+		ClusterDNS        string
 		AdvertiseAddress  string
 		APIServerPort     int
 		KubernetesVersion string
@@ -425,7 +442,8 @@ func generateConfig(k8s config.KubernetesConfig, r cruntime.Manager) (string, er
 		NoTaintMaster     bool
 	}{
 		CertDir:           util.DefaultCertPath,
-		ServiceCIDR:       k8s.ServiceCIDR,
+		ServiceCIDR:       util.DefaultServiceCIDR,
+		ClusterDNS:        clusterDNS.String(),
 		AdvertiseAddress:  k8s.NodeIP,
 		APIServerPort:     nodePort,
 		KubernetesVersion: k8s.KubernetesVersion,
